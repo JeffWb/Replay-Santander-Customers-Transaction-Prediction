@@ -17,6 +17,8 @@ if switch:
     all_data = train
 
     # magic.1
+    #这段代码是使用的第29名的方案，后来来复盘是看到的，因为最先指出fake test的大佬的代码没看懂，当时直接用的他给分好的文件，
+    #复盘的时候这位的代码看懂了，而且很好理解，所以在这里是用了29th大佬的real_test代码
     #训练数据的特征名称列表
     #最后找到的真的测试集只有100000个
     train_cols = [c for c in train.columns if c not in ['ID_code', 'target', 'predicted', 'size', 'index']]

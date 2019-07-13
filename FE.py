@@ -16,7 +16,7 @@ if switch:
     # print(test)
     all_data = train
 
-    # identify the fake test data as in above kernel
+    # magic.1
     #训练数据的特征名称列表
     #最后找到的真的测试集只有100000个
     train_cols = [c for c in train.columns if c not in ['ID_code', 'target', 'predicted', 'size', 'index']]
@@ -34,7 +34,8 @@ if switch:
     print(test_real)
     test_real.to_csv("real_test.csv",index = False)
 
-    # add the counts
+    
+    #magic.2
     #将训练集和真是测试集按行方向合并，因为真实测试集没有target，所以为NaN
     count_data = pd.concat([train, test_real], axis=0, sort=True)
     # print(count_data)

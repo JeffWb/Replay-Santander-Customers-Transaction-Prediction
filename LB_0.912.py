@@ -4,38 +4,32 @@ import os
 import lightgbm as lgb
 from sklearn.metrics import roc_auc_score
 from sklearn.model_selection import StratifiedKFold
-import matplotlib.pyplot as plt
-from sklearn.preprocessing import StandardScaler
-import seaborn as sns
 
 #read data
 train = pd.read_csv("train.csv")
 test = pd.read_csv("test.csv")
-# real_test = pd.read_csv("real_test.csv")
 count_data = pd.read_csv("count_data1.csv")
 
 train = count_data.iloc[:200000]
-# train = count_data["target"].notnull()
 print(train)
 target = train["target"]
 
 real_test = count_data.iloc[200000:].reset_index(drop = True)
-# real_test = count_data["target"].isnull()
 # print(real_test)
 
 #训练标签
 # target = pd.Series(list(train["target"])*200)
 #将所有的转为两列，一列是原数据，一列是count encoding
-def trans(df,sign):
-    var_s = pd.Series()
-    var_size_s = pd.Series()
-    for c in range(200):
-        print(sign+" num.{}".format(c))
-        var_s = pd.concat([df["var_"+str(c)],var_s],axis = 0,ignore_index = True)
-        var_size_s = pd.concat([df["var_"+str(c)+"_size"],var_size_s],axis = 0,ignore_index = True)
-    df = pd.DataFrame({"var":var_s,"var_size":var_size_s})
-    print(df)
-    return df
+# def trans(df,sign):
+#     var_s = pd.Series()
+#     var_size_s = pd.Series()
+#     for c in range(200):
+#         print(sign+" num.{}".format(c))
+#         var_s = pd.concat([df["var_"+str(c)],var_s],axis = 0,ignore_index = True)
+#         var_size_s = pd.concat([df["var_"+str(c)+"_size"],var_size_s],axis = 0,ignore_index = True)
+#     df = pd.DataFrame({"var":var_s,"var_size":var_size_s})
+#     print(df)
+#     return df
 
 
 
@@ -60,6 +54,7 @@ params = {
 
 folds = StratifiedKFold(n_splits = 5,shuffle =True,random_state = 77777)
 oof = np.zeros((len(train),200))
+total_oof = np.zeros(len(train),200)
 predictions = np.zeros(len(real_test))
 val_auc = []
 
@@ -76,9 +71,10 @@ for fold,(trn_idx,val_idx) in enumerate(folds.split(train.values,target.values))
         print(val_auc[-1])
         predictions += clf.predict(real_test[feature_chioce],num_iteration = clf.best_iteration)
     predictions = (predictions/200)
+    total_oof += oof
 predictions = predictions/5
 
 mean_auc = np.mean(val_auc)
 std_auc = np.std(val_auc)
-all_auc = roc_auc_score(target,oof.sum(axis = 1)/200)
+all_auc = roc_auc_score(target,oof.sum(axis = 1)/1000)
 print("Mean auc:%.9f,   std:%.9f  All auc:%.9f"  %(mean_auc,std_auc,all_auc))

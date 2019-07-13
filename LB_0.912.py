@@ -54,7 +54,7 @@ params = {
 
 folds = StratifiedKFold(n_splits = 5,shuffle =True,random_state = 77777)
 oof = np.zeros((len(train),200))
-total_oof = np.zeros(len(train),200)
+total_oof = np.zeros((len(train),200))
 predictions = np.zeros(len(real_test))
 val_auc = []
 
@@ -65,7 +65,7 @@ for fold,(trn_idx,val_idx) in enumerate(folds.split(train.values,target.values))
         feature_chioce = ["var_"+str(c),"var_"+str(c)+"_size"]
         trn_data = lgb.Dataset(train.iloc[trn_idx][feature_chioce],label = target[trn_idx])
         val_data = lgb.Dataset(train.iloc[val_idx][feature_chioce],label = target[val_idx])
-        clf = lgb.train(params,trn_data,100000,valid_sets = [trn_data,val_data],verbose_eval = 400,early_stopping_rounds = 1000)
+        clf = lgb.train(params,trn_data,100000,valid_sets = [trn_data,val_data],verbose_eval = 200,early_stopping_rounds = 3000)
         oof[val_idx,c:c+1] = clf.predict(train.iloc[val_idx][feature_chioce],num_iteration = clf.best_iteration).reshape((len(val_idx),1))
         val_auc.append(roc_auc_score(target[val_idx],oof[val_idx,c:c+1]))
         print(val_auc[-1])

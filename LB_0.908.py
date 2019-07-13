@@ -6,7 +6,6 @@ from sklearn.metrics import roc_auc_score
 from sklearn.model_selection import StratifiedKFold
 import matplotlib.pyplot as plt
 from sklearn.preprocessing import StandardScaler
-import seaborn as sns
 
 #read data
 train = pd.read_csv("train.csv")
@@ -15,10 +14,8 @@ test = pd.read_csv("test.csv")
 count_data = pd.read_csv("count_dat1.csv")
 
 train = count_data.iloc[:200000]
-# train = count_data["target"].notnull()
 # print(train)
 real_test = count_data.iloc[200000:].reset_index(drop = True)
-# real_test = count_data["target"].isnull()
 # print(real_test)
 
 # real_test_id = real_test.ID_code

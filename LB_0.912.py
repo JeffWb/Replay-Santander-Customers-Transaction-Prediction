@@ -76,5 +76,5 @@ predictions = predictions/5
 
 mean_auc = np.mean(val_auc)
 std_auc = np.std(val_auc)
-all_auc = roc_auc_score(target,oof.sum(axis = 1)/1000)
+all_auc = roc_auc_score(target,oof.sum(axis = 1)/200)
 print("Mean auc:%.9f,   std:%.9f  All auc:%.9f"  %(mean_auc,std_auc,all_auc))

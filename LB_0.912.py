@@ -53,13 +53,14 @@ params = {
 }
 
 folds = StratifiedKFold(n_splits = 5,shuffle =True,random_state = 77777)
-oof = np.zeros((len(train),200))
 total_oof = np.zeros((len(train),200))
-predictions = np.zeros(len(real_test))
+final_predictions = np.zeros(len(real_test))
 val_auc = []
 
 for fold,(trn_idx,val_idx) in enumerate(folds.split(train.values,target.values)):
     print(">>>>>>>>>>>>>>>>>>>>>>>Fold  {}".format(fold))
+    oof = np.zeros((len(train),200))
+    predictions = np.zeros(len(real_test))
     for c in range(200):
         print(">>>>>>>>>>>>>>>>>>>>var_{}".format(c))
         feature_chioce = ["var_"+str(c),"var_"+str(c)+"_size"]
@@ -67,14 +68,13 @@ for fold,(trn_idx,val_idx) in enumerate(folds.split(train.values,target.values))
         val_data = lgb.Dataset(train.iloc[val_idx][feature_chioce],label = target[val_idx])
         clf = lgb.train(params,trn_data,100000,valid_sets = [trn_data,val_data],verbose_eval = 200,early_stopping_rounds = 3000)
         oof[val_idx,c:c+1] = clf.predict(train.iloc[val_idx][feature_chioce],num_iteration = clf.best_iteration).reshape((len(val_idx),1))
-        val_auc.append(roc_auc_score(target[val_idx],oof[val_idx,c:c+1]))
-        print(val_auc[-1])
         predictions += clf.predict(real_test[feature_chioce],num_iteration = clf.best_iteration)
     predictions = (predictions/200)
     total_oof += oof
+    val_auc.append(roc_auc_score(target[val_idx],oof.sum(axis = 1)/200))
 predictions = predictions/5
 
 mean_auc = np.mean(val_auc)
 std_auc = np.std(val_auc)
-all_auc = roc_auc_score(target,oof.sum(axis = 1)/200)
+all_auc = roc_auc_score(target,total_oof.sum(axis = 1)/200)
 print("Mean auc:%.9f,   std:%.9f  All auc:%.9f"  %(mean_auc,std_auc,all_auc))
